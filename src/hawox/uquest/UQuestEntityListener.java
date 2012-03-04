@@ -19,15 +19,16 @@ import org.bukkit.entity.Spider;
 import org.bukkit.entity.Squid;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Zombie;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityListener;
 
 /**
  * Handle events for all Player related events
  */
-public class UQuestEntityListener extends EntityListener {
+public class UQuestEntityListener implements Listener {
     private final UQuest plugin;
 
     public UQuestEntityListener(UQuest instance) {
@@ -40,7 +41,7 @@ public class UQuestEntityListener extends EntityListener {
 	 * Now when that entity dies, whatever player is tagged as hitting it last will get the kill. Also, if this
 	 * works the way I hope, I don't have to purge a monster killed id list.
 	 */
-    @Override
+    @EventHandler
     public void onEntityDeath(EntityDeathEvent event){
     	//check if the entity is tagged
     	Entity dead = event.getEntity();
@@ -60,7 +61,7 @@ public class UQuestEntityListener extends EntityListener {
     		
     }
     
-    @Override
+    @EventHandler
     public void onEntityDamage(EntityDamageEvent event){
     	if(event.isCancelled())
     		return;

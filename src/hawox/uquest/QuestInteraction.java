@@ -11,15 +11,13 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import com.earth2me.essentials.User;
-import com.iConomy.iConomy;
-import com.iConomy.system.Holdings;
 
 /*
  * Extends ExtrasManager so people can use the methods from it with the API.
@@ -402,48 +400,46 @@ final public class QuestInteraction extends ExtrasManager{
 	/**
 	 * Support for different money stuff it's best to just use these!
 	 **/
-	@SuppressWarnings("static-access")
 	public double getMoney(Player player) {
-		if(plugin.isUseiConomy()){
-			return (plugin.getiConomy().getAccount(player.getName()).getHoldings().balance());
-		}else if(plugin.isUseBOSEconomy()){
-			return plugin.getBOSEconomy().getPlayerMoney(player.getName());
-		}else if(plugin.isUseEssentials()){
-			User user = User.get(player);
-			return user.getMoney();
-		}
-		return 0;
+		final Economy econ = plugin.getEconomy();
+		if( econ != null )
+			return econ.getBalance(player.getName());
+		else
+			return 0;
 	}
 
-	@SuppressWarnings("static-access")
-	public void setMoney(Player player, double toWhat) {
-		if(plugin.isUseiConomy()){
-			Holdings balance = iConomy.getAccount(player.getName()).getHoldings();
-			balance.set(toWhat);
-		}
-		if(plugin.isUseBOSEconomy()){
-			plugin.getBOSEconomy().setPlayerMoney(player.getName(), (int) toWhat, false);
-		}
-		if(plugin.isUseEssentials()){
-			User user = User.get(player);
-			user.setMoney(toWhat);
-		}
-	}
+//	@SuppressWarnings("static-access")
+//	public void setMoney(Player player, double toWhat) {
+//		if(plugin.isUseiConomy()){
+//			Holdings balance = iConomy.getAccount(player.getName()).getHoldings();
+//			balance.set(toWhat);
+//		}
+//		if(plugin.isUseBOSEconomy()){
+//			plugin.getBOSEconomy().setPlayerMoney(player.getName(), (int) toWhat, false);
+//		}
+//		if(plugin.isUseEssentials()){
+//			User user = User.get(player);
+//			user.setMoney(toWhat);
+//		}
+//	}
 	
 	public boolean hasEnoughMoney(Player player, int needed){
 		return(this.getMoney(player) >= needed);
 	}
 
 	public void addMoney(Player player, int addWhat, boolean showText) {
-		if(plugin.isUseBOSEconomy() || plugin.isUseEssentials() || plugin.isUseiConomy()){
+		final Economy econ = plugin.getEconomy();
+//		if(plugin.isUseBOSEconomy() || plugin.isUseEssentials() || plugin.isUseiConomy()){
+		if( econ != null ) {
 			Quester quester = getQuester(player);
-			double balance = getMoney(player);
+//			double balance = getMoney(player);
 			if(showText == true){
 				player.sendMessage(ChatColor.AQUA
 						+ "**You have been rewarded with "
 						+ Integer.toString(addWhat) + " " + plugin.getMoneyName() + "!");
 			}
-			setMoney(player, balance + addWhat);
+			econ.depositPlayer(player.getName(), addWhat);
+//			setMoney(player, balance + addWhat);
 			//Change this so we don't count money lost as money earned
 			if(addWhat > 0)
 				quester.setMoneyEarnedFromQuests(quester.getMoneyEarnedFromQuests() + addWhat);

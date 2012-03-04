@@ -18,22 +18,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.Server;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.config.Configuration;
 
 import sqLiteStor.SqLiteKeyValStor;
 
-import com.earth2me.essentials.Essentials;
-import com.iConomy.*;
 import com.nijiko.permissions.PermissionHandler;
-
-import cosine.boseconomy.BOSEconomy;
 
 /**
  * @author Hawox
@@ -55,9 +52,9 @@ public class UQuest extends JavaPlugin {
     //Plugin support
     private PluginSupport pluginSupport;
     private String Money_Plugin = "none";
-    private static iConomy iConomy = null;
-    private static BOSEconomy BOSEconomy = null;
-    private static Essentials Essentials = null;
+//    private static iConomy iConomy = null;
+//    private static BOSEconomy BOSEconomy = null;
+//    private static Essentials Essentials = null;
 	private static PermissionHandler Permissions = null;
     
     //Lists
@@ -112,8 +109,9 @@ public class UQuest extends JavaPlugin {
 	//stops bad things from happening when someone reloads the plugin
 	boolean firstLoad = true;
 	
+	private Economy economy = null;
 	
-	
+	public Economy getEconomy() { return economy; }
 
 	public void onDisable() {
 		//save flat file db
@@ -145,6 +143,8 @@ public class UQuest extends JavaPlugin {
 			getCommand("quest").setExecutor(cmd_uquest);
 			getCommand("q").setExecutor(cmd_uquest);
 		}
+		
+		setupEconomy();
 		
 		//These commands exist even if they are not using the default uQuest
 		Cmd_reloadquests cmd_reloadquests = new Cmd_reloadquests(this);
@@ -182,38 +182,56 @@ public class UQuest extends JavaPlugin {
 		registerEvents();
 
 		System.out.println(pluginNameBracket() + " v" + getPdfFile().getVersion() + " enabled! With " + this.getQuestInteraction().getQuestTotal() + " quests loaded!");
-		
-		pluginSupport = new PluginSupport(this);
-		//For iCon at least, it hooks in after the plugin enables. Solution: Timer!
-		ScheduledThreadPoolExecutor onEnable_Timer = new ScheduledThreadPoolExecutor(1);
-		onEnable_Timer.schedule(new Runnable() {
-			public void run() {
-				pluginSupport.link();
-				pluginSupport.checkPluginSupport();
-				}
-			}, pluginTimerCheck, TimeUnit.SECONDS);
+
+		// no longer necessary, Vault takes care of all this for us now. -morganm 3/3/11
+//		pluginSupport = new PluginSupport(this);
+//		//For iCon at least, it hooks in after the plugin enables. Solution: Timer!
+//		ScheduledThreadPoolExecutor onEnable_Timer = new ScheduledThreadPoolExecutor(1);
+//		onEnable_Timer.schedule(new Runnable() {
+//			public void run() {
+//				pluginSupport.link();
+//				pluginSupport.checkPluginSupport();
+//				}
+//			}, pluginTimerCheck, TimeUnit.SECONDS);
 	}
 	
+	private Boolean setupEconomy()
+    {
+        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (economyProvider != null) {
+            economy = economyProvider.getProvider();
+        }
+
+        return (economy != null);
+    }
+
 	public void registerEvents() {
 		// Register our events
 		PluginManager pm = getServer().getPluginManager();
 		
+		pm.registerEvents(playerListener, this);
+		pm.registerEvents(blockListener, this);
+		pm.registerEvents(this.entityListener, this);
+		
+		// turns out the custom events aren't even used anyway.  -morganm 3/3/11
+//		pm.registerEvents(this.uQuestListener, this);
+		
 		// Player Stuff
-		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener,Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener,Priority.Normal, this);
-
-
-		// Block Stuff
-		pm.registerEvent(Event.Type.BLOCK_DAMAGE, blockListener,Priority.Normal, this);
-		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener,Priority.Normal, this);
-		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener,Priority.Normal, this);
-		
-		// Entity Stuff
-		pm.registerEvent(Event.Type.ENTITY_DAMAGE, this.entityListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.ENTITY_DEATH, this.entityListener, Event.Priority.Normal, this);
-		
-		//custom!
-		pm.registerEvent(Event.Type.CUSTOM_EVENT, this.uQuestListener, Event.Priority.Normal, this);
+//		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener,Priority.Normal, this);
+//		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener,Priority.Normal, this);
+//
+//
+//		// Block Stuff
+//		pm.registerEvent(Event.Type.BLOCK_DAMAGE, blockListener,Priority.Normal, this);
+//		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener,Priority.Normal, this);
+//		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener,Priority.Normal, this);
+//		
+//		// Entity Stuff
+//		pm.registerEvent(Event.Type.ENTITY_DAMAGE, this.entityListener, Event.Priority.Normal, this);
+//		pm.registerEvent(Event.Type.ENTITY_DEATH, this.entityListener, Event.Priority.Normal, this);
+//		
+//		//custom!
+//		pm.registerEvent(Event.Type.CUSTOM_EVENT, this.uQuestListener, Event.Priority.Normal, this);
 	}
 	
 	public void readConfig() {
@@ -245,8 +263,9 @@ public class UQuest extends JavaPlugin {
 		 * 		protected int dropQuestCharge = 5000;
 		 * 
 		 */
-		Configuration config = new Configuration(new File(getDataFolder(), "config.yml"));
-		config.load();
+		FileConfiguration config = getConfig();
+//		Configuration config = new Configuration(new File(getDataFolder(), "config.yml"));
+//		config.load();
 		useDefaultUQuest = config.getBoolean("etc.useDefaultUQuest", useDefaultUQuest);
 		hideQuestRewards = config.getBoolean("etc.hideQuestRewards", hideQuestRewards);
 			try{
@@ -442,6 +461,16 @@ public class UQuest extends JavaPlugin {
 	}
 	
 
+	public static void setPermissions(PermissionHandler permissions) {
+		Permissions = permissions;
+	}
+
+	public static PermissionHandler getPermissions() {
+		return Permissions;
+	}
+    
+	/* no longer necessary, Vault takes care of all this for us now. -morganm 3/3/11
+
 	//Plugin support getters and setters
     public static iConomy getiConomy() {
         return iConomy;
@@ -455,14 +484,6 @@ public class UQuest extends JavaPlugin {
         }
         return true;
     }
-    
-	public static void setPermissions(PermissionHandler permissions) {
-		Permissions = permissions;
-	}
-
-	public static PermissionHandler getPermissions() {
-		return Permissions;
-	}
     
 	public static BOSEconomy getBOSEconomy() {
 		return BOSEconomy;
@@ -480,6 +501,7 @@ public class UQuest extends JavaPlugin {
 	public static void setEssentials(Essentials essentials) {
 		Essentials = essentials;
 	}
+    */
 
 	//Getters and Setters
 	public ArrayList<LoadedQuest> getTheQuests() {

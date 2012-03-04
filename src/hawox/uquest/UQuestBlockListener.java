@@ -4,22 +4,23 @@ import hawox.uquest.questclasses.LoadedQuest;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 /**
  * Sample block listener
  */
-public class UQuestBlockListener extends BlockListener {
+public class UQuestBlockListener implements Listener {
     private final UQuest plugin;
 
     public UQuestBlockListener(final UQuest plugin) {
         this.plugin = plugin;
     }
 
-    @Override
+    @EventHandler
 	public void onBlockBreak(BlockBreakEvent event){
     	if(plugin.isEnabled() == true){
     	Block block = event.getBlock();
@@ -30,7 +31,7 @@ public class UQuestBlockListener extends BlockListener {
     	}
     }
     
-    @Override
+    @EventHandler
     public void onBlockDamage(BlockDamageEvent event) {
     	if(plugin.isEnabled() == true){
     	Block block = event.getBlock();
@@ -42,7 +43,7 @@ public class UQuestBlockListener extends BlockListener {
     	}
     }
     
-    @Override
+    @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
     	if(plugin.isEnabled() == true){
     	Block block = event.getBlock();

@@ -4,7 +4,6 @@ import hawox.uquest.Quester;
 
 import org.bukkit.entity.Player;
 
-@SuppressWarnings("serial")
 public class QuestDropEvent extends UQuestEvent{
 	Player player;
 	Quester quester;
@@ -12,7 +11,7 @@ public class QuestDropEvent extends UQuestEvent{
 	
 	
 	public QuestDropEvent(Player p, Quester q, int id){
-		super("QuestGetEvent");
+//		super("QuestGetEvent");
 		this.player = p;
 		this.quester = q;
 		this.questId = id;

@@ -3,22 +3,23 @@ package hawox.uquest;
 import hawox.uquest.questclasses.LoadedQuest;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 
 /**
  * Handle events for all Player related events
  */
-public class UQuestPlayerListener extends PlayerListener {
+public class UQuestPlayerListener implements Listener {
     private final UQuest plugin;
 
     public UQuestPlayerListener(UQuest instance) {
         plugin = instance;
     }
     
-    @Override
+    @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
     	Player player = event.getPlayer();
     	//Keep track of all the players that have logged in
@@ -42,7 +43,7 @@ public class UQuestPlayerListener extends PlayerListener {
     	}
     }
     
-    @Override
+    @EventHandler
     public void onPlayerMove(PlayerMoveEvent event){
     	Player player = event.getPlayer();
        	if(plugin.isEnabled() == true){
