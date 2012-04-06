@@ -142,7 +142,13 @@ final public class QuestInteraction extends ExtrasManager{
 				int itemNumberatInterValReward = numberGen.nextInt( plugin.getQuestRewards().length );
 				try{
 					String rewards[] = plugin.getQuestRewards()[itemNumberatInterValReward].split(",");
-					player.getInventory().addItem(new ItemStack(Integer.parseInt(rewards[0]), Integer.parseInt(rewards[2])));
+					int index = rewards[2].indexOf(':');
+					short durability = 0;
+					if( index != -1 ) {
+						durability = Short.valueOf(rewards[2].substring(index+1, rewards[2].length()));
+						rewards[2] = rewards[2].substring(0, index);
+					}
+					player.getInventory().addItem(new ItemStack(Integer.parseInt(rewards[0]), Integer.parseInt(rewards[2]), durability));
 					plugin.getServer().broadcastMessage(ChatColor.YELLOW + player.getName() + " got a reward of " + ChatColor.DARK_PURPLE + rewards[2] + " " + rewards[1] + ChatColor.YELLOW + "!");
 				}catch(NumberFormatException nfe){
 					plugin.log.log(Level.SEVERE, UQuest.pluginNameBracket() + " Invalid quest reward item ID! Giving them dirt by default!");

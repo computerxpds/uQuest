@@ -271,14 +271,19 @@ public class UQuest extends JavaPlugin {
 			try{
 				String[] questRewardsFromFile = config.getString("etc.questRewards", questRewardsDefault).split("~");
 				setQuestRewards(questRewardsFromFile);
-				//test every reward threw a meaningless loop to try and get the catch to run
+				//test every reward through a meaningless loop to try and get the catch to run
 				for(int i=0; i<questRewardsFromFile.length; i++){
 					String rewards[] = questRewardsFromFile[i].split(",");
 					rewards[0] = rewards[0];
 					rewards[1] = rewards[1];
 					rewards[2] = rewards[2];
+					int index = rewards[2].indexOf(':');
+					if( index != -1 ) {
+						Short.valueOf(rewards[2].substring(index+1, rewards[2].length()));
+						rewards[2] = rewards[2].substring(0, index);
+					}
 				}
-			} catch (ArrayIndexOutOfBoundsException aiobe) {
+			} catch (Exception e) {
 				log.log(Level.SEVERE, pluginNameBracket() + " Error setting up quest rewards! Fix the config file!");
 				log.log(Level.SEVERE, pluginNameBracket() + " Quest item rewards are loaded as defaults!");
 				setQuestRewards(questRewards);
