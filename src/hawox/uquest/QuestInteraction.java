@@ -11,15 +11,13 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import com.earth2me.essentials.User;
-import com.iConomy.iConomy;
-import com.iConomy.system.Holdings;
 
 /*
  * Extends ExtrasManager so people can use the methods from it with the API.
@@ -144,7 +142,13 @@ final public class QuestInteraction extends ExtrasManager{
 				int itemNumberatInterValReward = numberGen.nextInt( plugin.getQuestRewards().length );
 				try{
 					String rewards[] = plugin.getQuestRewards()[itemNumberatInterValReward].split(",");
-					player.getInventory().addItem(new ItemStack(Integer.parseInt(rewards[0]), Integer.parseInt(rewards[2])));
+					int index = rewards[2].indexOf(':');
+					short durability = 0;
+					if( index != -1 ) {
+						durability = Short.valueOf(rewards[2].substring(index+1, rewards[2].length()));
+						rewards[2] = rewards[2].substring(0, index);
+					}
+					player.getInventory().addItem(new ItemStack(Integer.parseInt(rewards[0]), Integer.parseInt(rewards[2]), durability));
 					plugin.getServer().broadcastMessage(ChatColor.YELLOW + player.getName() + " got a reward of " + ChatColor.DARK_PURPLE + rewards[2] + " " + rewards[1] + ChatColor.YELLOW + "!");
 				}catch(NumberFormatException nfe){
 					plugin.log.log(Level.SEVERE, UQuest.pluginNameBracket() + " Invalid quest reward item ID! Giving them dirt by default!");
@@ -232,7 +236,7 @@ final public class QuestInteraction extends ExtrasManager{
 		//droped quests
 		player.sendMessage("Quests dropped: " + quester.getQuestsDropped());
 		//tell the player the amount of money they have earned from quests
-		if(plugin.isUseiConomy() == true){
+		if(plugin.getEconomy() != null) {
 			player.sendMessage("Total " + plugin.getMoneyName() + " received: " + quester.getMoneyEarnedFromQuests());
 		}
 		//get their rank!
@@ -402,48 +406,46 @@ final public class QuestInteraction extends ExtrasManager{
 	/**
 	 * Support for different money stuff it's best to just use these!
 	 **/
-	@SuppressWarnings("static-access")
 	public double getMoney(Player player) {
-		if(plugin.isUseiConomy()){
-			return (plugin.getiConomy().getAccount(player.getName()).getHoldings().balance());
-		}else if(plugin.isUseBOSEconomy()){
-			return plugin.getBOSEconomy().getPlayerMoney(player.getName());
-		}else if(plugin.isUseEssentials()){
-			User user = User.get(player);
-			return user.getMoney();
-		}
-		return 0;
+		final Economy econ = plugin.getEconomy();
+		if( econ != null )
+			return econ.getBalance(player.getName());
+		else
+			return 0;
 	}
 
-	@SuppressWarnings("static-access")
-	public void setMoney(Player player, double toWhat) {
-		if(plugin.isUseiConomy()){
-			Holdings balance = iConomy.getAccount(player.getName()).getHoldings();
-			balance.set(toWhat);
-		}
-		if(plugin.isUseBOSEconomy()){
-			plugin.getBOSEconomy().setPlayerMoney(player.getName(), (int) toWhat, false);
-		}
-		if(plugin.isUseEssentials()){
-			User user = User.get(player);
-			user.setMoney(toWhat);
-		}
-	}
+//	@SuppressWarnings("static-access")
+//	public void setMoney(Player player, double toWhat) {
+//		if(plugin.isUseiConomy()){
+//			Holdings balance = iConomy.getAccount(player.getName()).getHoldings();
+//			balance.set(toWhat);
+//		}
+//		if(plugin.isUseBOSEconomy()){
+//			plugin.getBOSEconomy().setPlayerMoney(player.getName(), (int) toWhat, false);
+//		}
+//		if(plugin.isUseEssentials()){
+//			User user = User.get(player);
+//			user.setMoney(toWhat);
+//		}
+//	}
 	
 	public boolean hasEnoughMoney(Player player, int needed){
 		return(this.getMoney(player) >= needed);
 	}
 
 	public void addMoney(Player player, int addWhat, boolean showText) {
-		if(plugin.isUseBOSEconomy() || plugin.isUseEssentials() || plugin.isUseiConomy()){
+		final Economy econ = plugin.getEconomy();
+//		if(plugin.isUseBOSEconomy() || plugin.isUseEssentials() || plugin.isUseiConomy()){
+		if( econ != null ) {
 			Quester quester = getQuester(player);
-			double balance = getMoney(player);
+//			double balance = getMoney(player);
 			if(showText == true){
 				player.sendMessage(ChatColor.AQUA
 						+ "**You have been rewarded with "
 						+ Integer.toString(addWhat) + " " + plugin.getMoneyName() + "!");
 			}
-			setMoney(player, balance + addWhat);
+			econ.depositPlayer(player.getName(), addWhat);
+//			setMoney(player, balance + addWhat);
 			//Change this so we don't count money lost as money earned
 			if(addWhat > 0)
 				quester.setMoneyEarnedFromQuests(quester.getMoneyEarnedFromQuests() + addWhat);
@@ -531,6 +533,7 @@ final public class QuestInteraction extends ExtrasManager{
 		plugin.setBroadcastSaving(broadcastSaving);
 	}
 
+	/*
 	public boolean isUseiConomy() {
 		return plugin.isUseiConomy();
 	}
@@ -538,6 +541,7 @@ final public class QuestInteraction extends ExtrasManager{
 	public void setUseiConomy(boolean useiConomy) {
 		plugin.setUseiConomy(useiConomy);
 	}
+	*/
 
 	public boolean isUsePermissions() {
 		return plugin.isUsePermissions();
@@ -609,6 +613,8 @@ final public class QuestInteraction extends ExtrasManager{
 	public void setDropQuestCharge(int dropQuestCharge) {
 		plugin.setDropQuestCharge(dropQuestCharge);
 	}
+	
+	/*
 
 	public boolean isUseBOSEconomy() {
 		return plugin.isUseBOSEconomy();
@@ -617,6 +623,7 @@ final public class QuestInteraction extends ExtrasManager{
 	public void setUseBOSEconomy(boolean useBOSEconomy) {
 		plugin.setUseBOSEconomy(useBOSEconomy);
 	}
+	*/
 	
 	
 	

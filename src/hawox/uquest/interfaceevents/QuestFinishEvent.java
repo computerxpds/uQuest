@@ -4,14 +4,13 @@ import hawox.uquest.Quester;
 
 import org.bukkit.entity.Player;
 
-@SuppressWarnings("serial")
 public class QuestFinishEvent extends UQuestEvent{
 	Player player;
 	Quester quester;
 	int questId;
 	
 	public QuestFinishEvent(Player p, Quester q, int id){
-		super("QuestFinishEvent");
+//		super("QuestFinishEvent");
 		this.player = p;
 		this.quester = q;
 		this.questId = id;

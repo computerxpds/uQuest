@@ -1,30 +1,33 @@
 package hawox.uquest;
 
-import org.bukkit.event.CustomEventListener;
-import org.bukkit.event.Event;
-import org.bukkit.event.Listener;
-
 import hawox.uquest.interfaceevents.QuestDropEvent;
 import hawox.uquest.interfaceevents.QuestFinishEvent;
 import hawox.uquest.interfaceevents.QuestGetEvent;
 import hawox.uquest.interfaceevents.TrackerAddEvent;
 
-public class QuestListener extends CustomEventListener
- implements Listener{
-	
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+
+public class QuestListener implements Listener
+{
+	@EventHandler
 	public void onTrackerAdd(TrackerAddEvent event){
 	}
 	
+	@EventHandler
 	public void onQuestGet(QuestGetEvent event){
 	}
 	
+	@EventHandler
 	public void onQuestFinish(QuestFinishEvent event){	
 	}
 	
+	@EventHandler
 	public void onQuestDrop(QuestDropEvent event){	
 	}
 	
 	//Get the correct methods to run
+/* No longer necessary with R5-style events.  -morganm 3/3/11
 	public void onCustomEvent(Event event){
 		if(event instanceof TrackerAddEvent)
 			onTrackerAdd((TrackerAddEvent)event);
@@ -35,4 +38,5 @@ public class QuestListener extends CustomEventListener
 		else if(event instanceof QuestDropEvent)
 			onQuestDrop((QuestDropEvent)event);
 	}
+	*/
 }

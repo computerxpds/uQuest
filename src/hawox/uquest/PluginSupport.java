@@ -1,20 +1,14 @@
 package hawox.uquest;
 
-import java.util.logging.Level;
-
-import org.bukkit.plugin.Plugin;
-
-import com.earth2me.essentials.Essentials;
-import com.iConomy.iConomy;
-import com.nijikokun.bukkit.Permissions.Permissions;
-
-import cosine.boseconomy.BOSEconomy;
 
 /**
- * Setup plugin support
+ * Setup plugin support.
+ * 
+ * no longer necessary, Vault takes care of all this for us now. -morganm 3/3/11
  */
 public class PluginSupport{
 
+	/*
     private final UQuest plugin;
 	
 	public PluginSupport(UQuest plugin) {
@@ -111,4 +105,5 @@ public class PluginSupport{
 			plugin.setUseEssentials(false);
 		}
 	}
+	*/
 }
