@@ -236,7 +236,7 @@ final public class QuestInteraction extends ExtrasManager{
 		//droped quests
 		player.sendMessage("Quests dropped: " + quester.getQuestsDropped());
 		//tell the player the amount of money they have earned from quests
-		if(plugin.isUseiConomy() == true){
+		if(plugin.getEconomy() != null) {
 			player.sendMessage("Total " + plugin.getMoneyName() + " received: " + quester.getMoneyEarnedFromQuests());
 		}
 		//get their rank!
@@ -533,6 +533,7 @@ final public class QuestInteraction extends ExtrasManager{
 		plugin.setBroadcastSaving(broadcastSaving);
 	}
 
+	/*
 	public boolean isUseiConomy() {
 		return plugin.isUseiConomy();
 	}
@@ -540,6 +541,7 @@ final public class QuestInteraction extends ExtrasManager{
 	public void setUseiConomy(boolean useiConomy) {
 		plugin.setUseiConomy(useiConomy);
 	}
+	*/
 
 	public boolean isUsePermissions() {
 		return plugin.isUsePermissions();
@@ -611,6 +613,8 @@ final public class QuestInteraction extends ExtrasManager{
 	public void setDropQuestCharge(int dropQuestCharge) {
 		plugin.setDropQuestCharge(dropQuestCharge);
 	}
+	
+	/*
 
 	public boolean isUseBOSEconomy() {
 		return plugin.isUseBOSEconomy();
@@ -619,6 +623,7 @@ final public class QuestInteraction extends ExtrasManager{
 	public void setUseBOSEconomy(boolean useBOSEconomy) {
 		plugin.setUseBOSEconomy(useBOSEconomy);
 	}
+	*/
 	
 	
 	

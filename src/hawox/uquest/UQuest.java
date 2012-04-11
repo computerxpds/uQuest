@@ -19,8 +19,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Server;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -29,8 +32,6 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import sqLiteStor.SqLiteKeyValStor;
-
-import com.nijiko.permissions.PermissionHandler;
 
 /**
  * @author Hawox
@@ -55,7 +56,8 @@ public class UQuest extends JavaPlugin {
 //    private static iConomy iConomy = null;
 //    private static BOSEconomy BOSEconomy = null;
 //    private static Essentials Essentials = null;
-	private static PermissionHandler Permissions = null;
+//	private static PermissionHandler Permissions = null;
+	public static Permission vaultPerms = null;
     
     //Lists
 	protected HashSet<Quester> theQuesterList = new HashSet<Quester>();						//Loaded players
@@ -82,12 +84,12 @@ public class UQuest extends JavaPlugin {
 	private boolean hideQuestRewards = false;
 	private boolean scaleQuestLevels = true;
 	private boolean broadcastSaving = true;
-	private boolean useiConomy = true;
+//	private boolean useiConomy = true;
 	private boolean usePermissions = true;
 	private boolean useSQLite = false;
 	private boolean useDefaultUQuest = true;
-	private boolean useBOSEconomy = false;
-	private boolean useEssentials = false;
+//	private boolean useBOSEconomy = false;
+//	private boolean useEssentials = false;
 	private int SaveQuestersInfoIntervalInMinutes = 30;
 	private int questAnnounceInterval = 5;
 	private int questRewardInterval = 10;
@@ -95,7 +97,7 @@ public class UQuest extends JavaPlugin {
 	private int dropQuestInterval = 60;
 	private int dropQuestCharge = 5000;
     private String moneyName = "Monies";
-    private int pluginTimerCheck = 5;
+//    private int pluginTimerCheck = 5;
     private String questRewardsDefault = "87,Netherrack Blocks,10~88,Soul Sand Blocks,10~89,Glowstone Blocks,10~18,Leaf Blocks,10~344,Eggs,10~348,Glowstone Dust,10";
 	private String[] questRewards = { "87,Netherrack Blocks,10",
 			  "88,Soul Sand Blocks,10",
@@ -128,6 +130,8 @@ public class UQuest extends JavaPlugin {
 
 		//load up our files if they don't exist
 		moveFiles();
+		
+		setupPermissions();
 		
 		//Load our flat file player DB
 		questPlayerStorage = new iProperty("plugins/uQuest/uQuest_Players.txt");
@@ -197,14 +201,44 @@ public class UQuest extends JavaPlugin {
 	
 	private Boolean setupEconomy()
     {
-        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if (economyProvider != null) {
-            economy = economyProvider.getProvider();
-        }
+		if( getServer().getPluginManager().getPlugin("Vault") != null ) {
+	        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+	        if (economyProvider != null) {
+	            economy = economyProvider.getProvider();
+	        }
+		}
 
         return (economy != null);
     }
 
+	private boolean setupPermissions()
+	{
+		if( getServer().getPluginManager().getPlugin("Vault") != null ) {
+			RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+			if (permissionProvider != null) {
+				vaultPerms = permissionProvider.getProvider();
+			}
+		}
+		return (vaultPerms != null);
+	}
+	
+	public boolean hasPermission(CommandSender sender, String permission) {
+		if( sender instanceof ConsoleCommandSender )
+			return true;
+
+		// from here forward it must be a player object to pass
+		if( !(sender instanceof Player) )
+			return false;
+		Player p = (Player) sender;
+
+		if( usePermissions && vaultPerms != null )
+			return vaultPerms.has(p, permission);
+		else if( p.isOp() )
+			return true;
+		else
+			return false;
+	}
+	 
 	public void registerEvents() {
 		// Register our events
 		PluginManager pm = getServer().getPluginManager();
@@ -297,14 +331,14 @@ public class UQuest extends JavaPlugin {
 		moneyName = config.getString("PluginSupport.moneyName", moneyName);
 		
 		//*** money plugin stuff ***//
-		pluginTimerCheck = config.getInt("PluginSupport.pluginTimerCheck", pluginTimerCheck);
-		Money_Plugin = config.getString("PluginSupport.MoneyPlugin", "none");
-		if(Money_Plugin.equalsIgnoreCase("iConomy"))
-			this.useiConomy = true;
-		if(Money_Plugin.equalsIgnoreCase("BOSEconomy"))
-			this.useBOSEconomy = true;
-		if(Money_Plugin.equalsIgnoreCase("Essentials"))
-			this.useEssentials = true;
+//		pluginTimerCheck = config.getInt("PluginSupport.pluginTimerCheck", pluginTimerCheck);
+//		Money_Plugin = config.getString("PluginSupport.MoneyPlugin", "none");
+//		if(Money_Plugin.equalsIgnoreCase("iConomy"))
+//			this.useiConomy = true;
+//		if(Money_Plugin.equalsIgnoreCase("BOSEconomy"))
+//			this.useBOSEconomy = true;
+//		if(Money_Plugin.equalsIgnoreCase("Essentials"))
+//			this.useEssentials = true;
 
 		questLevelInterval = config.getInt("QuestLevels.questLevelInterval", questLevelInterval);
 		scaleQuestLevels = config.getBoolean("QuestLevels.scaleQuestLevels", scaleQuestLevels);
@@ -466,6 +500,7 @@ public class UQuest extends JavaPlugin {
 	}
 	
 
+	/* no longer necessary, Vault takes care of all this for us now. -morganm 3/3/11
 	public static void setPermissions(PermissionHandler permissions) {
 		Permissions = permissions;
 	}
@@ -473,8 +508,6 @@ public class UQuest extends JavaPlugin {
 	public static PermissionHandler getPermissions() {
 		return Permissions;
 	}
-    
-	/* no longer necessary, Vault takes care of all this for us now. -morganm 3/3/11
 
 	//Plugin support getters and setters
     public static iConomy getiConomy() {
@@ -549,6 +582,7 @@ public class UQuest extends JavaPlugin {
 		this.broadcastSaving = broadcastSaving;
 	}
 
+	/*
 	public boolean isUseiConomy() {
 		return useiConomy;
 	}
@@ -556,6 +590,7 @@ public class UQuest extends JavaPlugin {
 	public void setUseiConomy(boolean useiConomy) {
 		this.useiConomy = useiConomy;
 	}
+	*/
 
 	public int getSaveQuestersInfoIntervalInMinutes() {
 		return SaveQuestersInfoIntervalInMinutes;
@@ -650,6 +685,7 @@ public class UQuest extends JavaPlugin {
 		this.questInteraction = questInteraction;
 	}
 
+	/*
 	public boolean isUseBOSEconomy() {
 		return useBOSEconomy;
 	}
@@ -657,6 +693,7 @@ public class UQuest extends JavaPlugin {
 	public void setUseBOSEconomy(boolean useBOSEconomy) {
 		this.useBOSEconomy = useBOSEconomy;
 	}
+	*/
 
 	public int getDropQuestInterval() {
 		return dropQuestInterval;
@@ -738,6 +775,7 @@ public class UQuest extends JavaPlugin {
 		Money_Plugin = money_Plugin;
 	}
 
+	/*
 	public boolean isUseEssentials() {
 		return useEssentials;
 	}
@@ -745,6 +783,7 @@ public class UQuest extends JavaPlugin {
 	public void setUseEssentials(boolean useEssentials) {
 		this.useEssentials = useEssentials;
 	}
+	*/
 
 	public String getQuestRewardsDefault() {
 		return questRewardsDefault;

@@ -27,25 +27,6 @@ public class Cmd_uquest implements CommandExecutor{
 				return true;
 			}
 		
-		//This is now a permissions communication check as well as an update notice.
-		try{
-			if(plugin.isUsePermissions() == true){
-				try{
-				if(UQuest.getPermissions().has(player, "uQuest.CanQuest")){
-					//System.err.println(plugin.pluginNameBracket() + " The node 'uQuest.CanQuest' is no longer used. Update this!");
-				}
-				}catch(NullPointerException npe){
-					plugin.setUsePermissions(false);
-					System.err.println(UQuest.pluginNameBracket() + " Permissions is returning null. Disabling it.");
-					System.err.println(UQuest.pluginNameBracket() + " If this is incorect read your uQuest config file and fix it.");
-				}
-			}
-		}catch(NoClassDefFoundError ncdfe){
-				//they don't have permissions so disable it plugin wide
-				plugin.setUsePermissions(false);
-				System.err.println(UQuest.pluginNameBracket() + " Failed to access Permissions plugin. Disabling support for it.");
-		}
-		
 //		if(processQuest == true){
 						
 			try{
@@ -68,8 +49,8 @@ public class Cmd_uquest implements CommandExecutor{
 					return true;
 				}
 					
-				if( (args[0].equalsIgnoreCase("give")) ){
-					if( (plugin.isUsePermissions() == false) || ( (plugin.isUsePermissions()) && (UQuest.getPermissions().has(player, "uQuest.CanQuest.give")) ) ){
+				if( (args[0].equalsIgnoreCase("give") || args[0].equalsIgnoreCase("g") ) ){
+					if( plugin.hasPermission(player, "uQuest.CanQuest.give") ) {
 						//We want the first quest to be easy. Always give quest id 1 first!
 						if(quester.getQuestsCompleted() < 1){
 							plugin.getQuestInteraction().giveQuest(0, player);
@@ -83,7 +64,7 @@ public class Cmd_uquest implements CommandExecutor{
 							
 								
 				if( (args[0].equalsIgnoreCase("info")) ){
-					if( (plugin.isUsePermissions() == false) || ( (plugin.isUsePermissions()) && (UQuest.getPermissions().has(player, "uQuest.CanQuest.info")) ) ){
+					if( plugin.hasPermission(player, "uQuest.CanQuest.info") ) {
 						//make sure the player has a quest then simply read out the info of that quest eZ
 						if(quester.getQuestID() == -1){
 							player.sendMessage("You don't have an active quest!");
@@ -97,7 +78,7 @@ public class Cmd_uquest implements CommandExecutor{
 				}
 							
 				if( (args[0].equalsIgnoreCase("stats")) ){
-					if( (plugin.isUsePermissions() == false) || ( (plugin.isUsePermissions()) && (UQuest.getPermissions().has(player, "uQuest.CanQuest.stats")) ) ){
+					if( plugin.hasPermission(player, "uQuest.CanQuest.stats") ) {
 						plugin.getQuestInteraction().showQuestersInfo(player);
 					}else{
 						player.sendMessage(ChatColor.RED + "You don't have permission to get your stats!");
@@ -105,7 +86,7 @@ public class Cmd_uquest implements CommandExecutor{
 				}
 				
 				if( (args[0].equalsIgnoreCase("amount")) ){
-					if( (plugin.isUsePermissions() == false) || ( (plugin.isUsePermissions()) && (UQuest.getPermissions().has(player, "uQuest.CanQuest.amount")) ) ){
+					if( plugin.hasPermission(player, "uQuest.CanQuest.amount") ) {
 						//Tell the player the # of quests in the system
 						player.sendMessage("There are currently " + ChatColor.GOLD + Integer.toString(plugin.getQuestInteraction().getQuestTotal()) + ChatColor.WHITE + " quests loaded!");
 					}else{
@@ -114,8 +95,8 @@ public class Cmd_uquest implements CommandExecutor{
 				}
 				
 							
-				if( (args[0].equalsIgnoreCase("done")) ){
-					if( (plugin.isUsePermissions() == false) || ( (plugin.isUsePermissions()) && (UQuest.getPermissions().has(player, "uQuest.CanQuest.done")) ) ){
+				if( (args[0].equalsIgnoreCase("done") || args[0].equalsIgnoreCase("d")) ){
+					if( plugin.hasPermission(player, "uQuest.CanQuest.done") ) {
 						if(quester.getQuestID() == -1){
 							player.sendMessage(ChatColor.RED + "You don't have an active quest!");
 						} else{
@@ -132,7 +113,7 @@ public class Cmd_uquest implements CommandExecutor{
 				}
 				
 				if(args[0].equalsIgnoreCase("drop")) {
-					if( (plugin.isUsePermissions() == false) || ( (plugin.isUsePermissions()) && (UQuest.getPermissions().has(player, "uQuest.CanDropQuest")) ) ){
+					if( plugin.hasPermission(player, "uQuest.CanQuest.CanDropQuest") ) {
 						//do they even have a quest?
 						if(quester.getQuestID() != -1){
 							if(plugin.getQuestInteraction().isPlayerOnDropQuestList(player.getName()) == true){
@@ -141,7 +122,8 @@ public class Cmd_uquest implements CommandExecutor{
 								//can drop quest check money
 								boolean canDropQuest = true;
 								int dropCharge = plugin.getQuestInteraction().getDropQuestCharge();
-								if(plugin.isUseBOSEconomy() || plugin.isUseEssentials() || plugin.isUseiConomy()){
+								if( plugin.getEconomy() != null ) {
+//								if(plugin.isUseBOSEconomy() || plugin.isUseEssentials() || plugin.isUseiConomy()){
 									//Enough money?
 									if(plugin.getQuestInteraction().hasEnoughMoney(player, dropCharge)){
 										plugin.getQuestInteraction().addMoney(player, -dropCharge);
