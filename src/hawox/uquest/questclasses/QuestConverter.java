@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import org.yaml.snakeyaml.JavaBeanDumper;
 
 //Yay CRUD code! T.T
+@SuppressWarnings("deprecation")
 public class QuestConverter {
 	/* OLD
 	public void theQuestsLoadAllIntoArray() {
