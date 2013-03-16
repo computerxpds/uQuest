@@ -17,7 +17,6 @@ public class Cmd_uquest implements CommandExecutor{
 		this.plugin = plugin;
 	}
 
-	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		Player player = null;
 		if(sender instanceof Player){

@@ -14,7 +14,6 @@ public class Cmd_reloadquests implements CommandExecutor{
 		this.plugin = plugin;
 	}
 
-	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// permission is protected by Bukkit plugin.yml (superperms)
 		
