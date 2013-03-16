@@ -496,7 +496,6 @@ final public class QuestInteraction extends ExtrasManager{
 	}
 	
 	public class rankSortComparator implements Comparator<Quester>{
-		@Override
 		public int compare(Quester a, Quester b) {
 			int returnMe = 0;
 			returnMe = a.getQuestsCompleted() - b.getQuestsCompleted();

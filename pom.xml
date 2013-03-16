@@ -26,16 +26,30 @@
   </build>
   <name>uQuest</name>
   <description>Simple Questing plugin for Bukkit</description>
+  <repositories>
+    <repository>
+      <id>bukkit-repo</id>
+      <url>http://repo.bukkit.org/content/groups/public</url>
+    </repository>
+    <repository>
+      <id>spout-repo</id>
+      <url>http://nexus.spout.org/content/groups/public/</url>
+    </repository>
+    <repository>
+	  <id>vault-repo</id>
+	  <url>http://ci.herocraftonline.com/plugin/repository/everything</url>
+    </repository>
+  </repositories>
   <dependencies>
-  	<dependency>
-  		<groupId>org.bukkit</groupId>
-  		<artifactId>bukkit</artifactId>
-  		<version>1.4.6-R0.1</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>net.milkbowl</groupId>
-  		<artifactId>vault</artifactId>
-  		<version>1.2.23-SNAPSHOT</version>
-  	</dependency>
+    <dependency>
+      <groupId>org.bukkit</groupId>
+      <artifactId>bukkit</artifactId>
+      <version>1.5-R0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>net.milkbowl</groupId>
+      <artifactId>vault</artifactId>
+      <version>1.2.25-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </project>
