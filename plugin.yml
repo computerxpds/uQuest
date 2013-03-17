@@ -1,0 +1,29 @@
+name: uQuest
+main: hawox.uquest.UQuest
+version: 2.0.1
+author: Hawox,morganm
+softdepend: [Vault]
+description: >
+             Heavily customizable quest plugin. Gets quests anywhere with a simple /uquest
+commands:
+  uquest:
+    description: All the quests commands
+    usage: |
+           /<command>
+           Example: /uquest - shows all of the commands for uQuest
+  quest:
+    description: All the quests commands (shorter)
+    usage: |
+           /<command>
+           Example: /uquest - shows all of the commands for uQuest
+  q:
+    description: All the quests commands (shortest)
+    usage: |
+           /<command>
+           Example: /uquest - shows all of the commands for uQuest
+  reloadquests:
+    permission: uQuest.CanReloadQuestConfig
+    description: Reloads the quests from the quests file.
+  reloadquestconfig:
+    permission: uQuest.CanReloadQuestConfig
+    description: Reloads the config file.
