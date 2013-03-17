@@ -1,7 +1,7 @@
 name: uQuest
 main: hawox.uquest.UQuest
 version: 2.0.1
-author: Hawox,morganm
+author: Hawox,andune,computerxpds
 softdepend: [Vault]
 description: >
              Heavily customizable quest plugin. Gets quests anywhere with a simple /uquest
