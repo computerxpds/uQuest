@@ -7,3 +7,5 @@
 bin
 
 target/uQuest-2.0.2-SNAPSHOT.jar
+
+*.jar
