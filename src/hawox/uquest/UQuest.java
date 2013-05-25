@@ -4,7 +4,7 @@ import hawox.uquest.commands.Cmd_reloadquestconfig;
 import hawox.uquest.commands.Cmd_reloadquests;
 import hawox.uquest.commands.Cmd_uquest;
 import hawox.uquest.questclasses.LoadedQuest;
-import hawox.uquest.questclasses.QuestConverter;
+//import hawox.uquest.questclasses.QuestConverter;
 import hawox.uquest.questclasses.QuestLoader;
 
 import java.io.File;
@@ -137,8 +137,8 @@ public class UQuest extends JavaPlugin {
 		questPlayerStorage = new iProperty("plugins/uQuest/uQuest_Players.txt");
 		
 		//Check if we need to convert old uQuest v1 quests
-		if(new File("plugins/uQuest/uQuest_Quests.txt").exists())
-			new QuestConverter();
+		//if(new File("plugins/uQuest/uQuest_Quests.txt").exists())
+		//	new QuestConverter();
 		
 		//registerCommands
 		if(isUseDefaultUQuest()){
